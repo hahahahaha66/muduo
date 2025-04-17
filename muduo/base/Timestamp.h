@@ -7,6 +7,7 @@
 #include <optional>
 #include <string>
 #include <sys/time.h>
+#include <inttypes.h> //包含PRId64
 
 class Timestamp
 {

@@ -1,4 +1,6 @@
 #include "Timestamp.h"
+#include <cstdint>
+#include <cstdio>
 
 //获取当前时间戳
 Timestamp Timestamp::now()
@@ -13,13 +15,24 @@ Timestamp Timestamp::now()
     return Timestamp(second * Timestamp::kMicroSecondsPerSecond + tv.tv_usec);
 }
 
-//格式化字符串
+//格式化字符串 [秒].[微秒]
+std::string Timestamp::toString() const
+{
+    char buf[32] = {0};
+    int64_t seconds = micioSecondsSinceEpoch_ / kMicroSecondsPerSecond;
+    int64_t microseconds = micioSecondsSinceEpoch_ % kMicroSecondsPerSecond;
+    snprintf(buf, sizeof(buf), "%" PRId64 ".%06" PRId64 "", seconds, microseconds);
+    return buf;
+}
+
+//格式化字符串 年/月/日 时间
 std::string Timestamp::toFormattedString(bool showMicroseconds) const
 {
     char buf[64] = {0};
     time_t seconds = static_cast<time_t>(micioSecondsSinceEpoch_ / kMicroSecondsPerSecond);
     //使用localtime函数把秒数格式化成日历时间
     tm *tm_time = localtime(&seconds);
+    //是否显示微秒
     if (showMicroseconds)
     {   
         int microsecond = static_cast<int>(micioSecondsSinceEpoch_ % kMicroSecondsPerSecond);
@@ -46,8 +59,9 @@ std::string Timestamp::toFormattedString(bool showMicroseconds) const
     return buf;
 }
 
-int main() {
-    Timestamp time;
-    std::cout << time.now().toFormattedString() << std::endl;
-    std::cout << time.now().toFormattedString(true) << std::endl;
-}
+// int main() {
+//     Timestamp time;
+//     std::cout << time.now().toFormattedString() << std::endl;
+//     std::cout << time.now().toFormattedString(true) << std::endl;
+//     std::cout << time.now().toString() << std::endl;
+// }
