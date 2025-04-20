@@ -8,8 +8,8 @@
 #include <string>
 #include <strings.h>
 
-const int kSmallBuffer = 4000;  //前端拼接的小缓冲区
-const int kLargeBuffer = 4000 * 1000;  //后端异步的大缓冲区
+constexpr const int kSmallBuffer = 4000;  //前端拼接的小缓冲区
+constexpr const int kLargeBuffer = 4000 * 1000;  //后端异步的大缓冲区
 
 template <int SIZE>
 class FixedBuffer : noncopyable

@@ -30,6 +30,7 @@ public:
     const Buffer& buffer() const { return buffer_; }  //获取完整的日志
     void resetBuffer() { buffer_.reset(); }     //重置日志
     
+    //一下是重载数字及字符，确保所有的输入都能成功到缓冲区内
     LogStream& operator<<(short);
     LogStream& operator<<(unsigned short);
     LogStream& operator<<(int);
@@ -55,7 +56,7 @@ private:
     static const int kMaxNumericSize = 48;  //用于将整书和浮点数格式化转化为字符串时，预留的最大缓冲区
 
     template<typename T>
-    void formatInteger(T);
+    void formatInteger(T);  //将数字写入缓冲区
 
     Buffer buffer_;  //缓冲区
 };
