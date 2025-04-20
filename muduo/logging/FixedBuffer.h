@@ -1,5 +1,5 @@
-#ifndef LOGGING_H
-#define LOGGING_H
+#ifndef FIXEDBUFFER_H
+#define FIXEDBUFFER_H
 
 #include "../base/noncopyable.h"
 #include <cstddef>
