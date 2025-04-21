@@ -11,6 +11,7 @@
 constexpr const int kSmallBuffer = 4000;  //前端拼接的小缓冲区
 constexpr const int kLargeBuffer = 4000 * 1000;  //后端异步的大缓冲区
 
+//提供基础缓冲区，用于存储数据
 template <int SIZE>
 class FixedBuffer : noncopyable
 {

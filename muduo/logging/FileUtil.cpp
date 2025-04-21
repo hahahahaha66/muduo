@@ -1,19 +1,17 @@
 #include "FileUtil.h"
 #include "Logging.h"
-#include <cstddef>
-#include <cstdio>
-#include <unistd.h>
+
 
 FileUtil::FileUtil(std::string& fileName) 
-    : fp_(::fopen(fileName.c_str(), "ae")),
+    : fp_(::fopen(fileName.c_str(), "ae")),  //获取文件描述符，追加模式
       writtenBytes_(0)
 {
-    ::setbuffer(fp_, buffer_, sizeof(buffer_));
+    ::setbuffer(fp_, buffer_, sizeof(buffer_));  //设置文件流的用户缓冲区
 }
 
 FileUtil::~FileUtil()
 {
-    ::fclose(fp_);
+    ::fclose(fp_);  //关闭文件描述符
 }
 
 void FileUtil::append(const char* data, size_t len)
@@ -39,10 +37,10 @@ void FileUtil::append(const char* data, size_t len)
 
 void FileUtil::flush()
 {
-    ::fflush(fp_);
+    ::fflush(fp_);  //强制刷新
 }
 
 size_t FileUtil::write(const char* data, size_t len)
 {
-    return ::fwrite_unlocked(data, 1, len, fp_);        
+    return ::fwrite_unlocked(data, 1, len, fp_);  //线程不安全，但效率更高
 }

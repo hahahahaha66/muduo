@@ -21,6 +21,7 @@ public:
     int len_;
 };
 
+//建立流式函数，通过重载<<来实现流式传输
 class LogStream : noncopyable
 {
 public:

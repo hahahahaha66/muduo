@@ -41,42 +41,43 @@ void LogFile::appendInLock(const char* data, int len)
             count_ = 0;
             time_t now = ::time(NULL);
             time_t thisPeriod = now / kRollPerSeconds_ * kRollPerSeconds_;
-            if (thisPeriod != startOfPeriod_)
+            if (thisPeriod != startOfPeriod_)  //跨天自动生成新的日志文件
             {
                 rollFile();
             }
-            else if (now - lastFlush_ > flushInterval_)
+            else if (now - lastFlush_ > flushInterval_)  //太久没刷新，自动刷新
             {
                 lastFlush_ = now;
-                file_->flush();
+                file_->flush();  //主动刷新
             }
         }
     }
 }
 
-void LogFile::flush()
+void LogFile::flush()  //手动刷新
 {
     file_->flush();
 }
 
-bool LogFile::rollFile()
+bool LogFile::rollFile()  //创建新日志文件
 {
     time_t now = 0;
-    std::string filename = getLogFileName(basename_, &now);
+    std::string filename = getLogFileName(basename_, &now);  //获取新日志文件名
 
     time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;
 
-    if (now > lastRoll_)
+    if (now > lastRoll_)  //防止一秒多次创建
     {
         lastRoll_ = now;
         lastFlush_ = now;
         startOfPeriod_ = start;
-        file_.reset(new FileUtil(filename));
+        file_.reset(new FileUtil(filename));  //同时重建FileUtil
         return true;
     }
     return false;
 }
 
+//生成新文件名
 std::string LogFile::getLogFileName(const std::string& basename, time_t* now)
 {
     std::string filename;

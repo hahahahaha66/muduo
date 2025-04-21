@@ -112,13 +112,13 @@ Logger::Logger(const char* file, int line, Logger::LogLevel level, const char* f
 
 Logger::~Logger()
 {
-    impl_.finish();
+    impl_.finish();  //补全日志信息
 
     const LogStream::Buffer& buf(stream().buffer());
 
     g_output(buf.data(), buf.length());
 
-    if(impl_.level_ == FATAL)
+    if(impl_.level_ == FATAL)  //若检测到致命错误，崩溃程序
     {
         g_flush();
         abort();
