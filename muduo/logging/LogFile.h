@@ -34,9 +34,9 @@ private:
     int count_;  //记录当前已写日志条数
 
     std::unique_ptr<std::mutex> mutex_;
-    time_t startOfPeriod_;
-    time_t lastRoll_;
-    time_t lastFlush_;
+    time_t startOfPeriod_;  //上一次日志文件生成的零点时间
+    time_t lastRoll_;  //上一次日志文件生成的时间
+    time_t lastFlush_;  //上一次刷新的时间
     std::unique_ptr<FileUtil> file_;  //使用封装好的写入刷新操作
 
     const static int kRollPerSeconds_ = 60*60*24;

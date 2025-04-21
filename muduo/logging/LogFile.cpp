@@ -64,7 +64,8 @@ bool LogFile::rollFile()  //创建新日志文件
     time_t now = 0;
     std::string filename = getLogFileName(basename_, &now);  //获取新日志文件名
 
-    time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;
+    //把当前的秒数除一天的秒数，由于计算机是整数除法，余数，也就是当天的秒数就被舍去了，再乘回来，就是当天零点的时间
+    time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;  
 
     if (now > lastRoll_)  //防止一秒多次创建
     {
