@@ -59,7 +59,7 @@ private:
     std::mutex mutex_;
     std::condition_variable cond_;
 
-    BufferPtr CurrentBuffer_;
+    BufferPtr currentBuffer_;
     BufferPtr nextBuffer_;
     BufferVector buffers_;  
 };
