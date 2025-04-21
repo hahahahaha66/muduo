@@ -34,7 +34,7 @@ public:
     int length() const { return static_cast<int>(end() - data_); }  //获取缓冲区长度
 
     char* current() { return cur_; }  //获得缓冲区当前字符
-    int avail() const { return static_cast<int>(end() - cur_); }  //获取当前字符串的剩余长度
+    int avail() const { return static_cast<int>(end() - cur_); }  //获取当前缓冲区的剩余长度
     void add(size_t len) { cur_ += len; }  //缓冲区向后推移len长度字符
 
     void reset() { cur_ = data_; }  //将缓冲区重置
