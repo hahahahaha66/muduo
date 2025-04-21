@@ -8,7 +8,7 @@
 class FileUtil
 {
 public:
-    explicit FileUtil(std::string& fileName);
+    explicit FileUtil(const std::string& fileName);
     ~FileUtil();
 
     void append(const char* data, size_t len);  //写入数据

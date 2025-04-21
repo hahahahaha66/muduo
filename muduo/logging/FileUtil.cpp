@@ -2,16 +2,32 @@
 #include "Logging.h"
 
 
-FileUtil::FileUtil(std::string& fileName) 
-    : fp_(::fopen(fileName.c_str(), "ae")),  //获取文件描述符，追加模式
-      writtenBytes_(0)
-{
+FileUtil::FileUtil(const std::string& fileName) 
+    : writtenBytes_(0)
+{   
+    if (fileName == "stdout")
+    {
+        fp_ = stdout;
+    }
+    else
+    {
+        fp_ = ::fopen(fileName.c_str(), "ae");  //获取文件描述符，追加模式
+    }
+
+    if (!fp_) {
+        fprintf(stderr, "Failed to open file: %s\n", fileName.c_str());
+        exit(1);
+    }
+
     ::setbuffer(fp_, buffer_, sizeof(buffer_));  //设置文件流的用户缓冲区
 }
 
 FileUtil::~FileUtil()
-{
-    ::fclose(fp_);  //关闭文件描述符
+{   
+    if (fp_ != stdout)
+    {
+        ::fclose(fp_);  //关闭文件描述符
+    }
 }
 
 void FileUtil::append(const char* data, size_t len)

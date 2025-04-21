@@ -1,43 +1,45 @@
 #include "AsyncLogging.h"
 #include "Logging.h"
 #include <functional>
+#include <memory>
 #include <thread>
 #include <vector>
 #include <chrono>
 #include <iostream>
 
-void logFunc(int id, int count)
+std::unique_ptr<AsyncLogging> g_asyncLog;
+
+void asyncOutput(const char* msg, int len)
 {
-    for (int i = 0; i <=count; i++) 
+    g_asyncLog->append(msg, len);
+}
+
+void logFunc()
+{
+    for (int i = 0; i <= 5; i++)
     {
-        LOG_INFO << "Thread " << id << " log line" << i;
-        std::this_thread::sleep_for((std::chrono::milliseconds(1)));
+        std::thread([i]() {
+            for (int j = 1; j <= 10; ++j)
+            {
+                LOG_INFO << "Thread " << i << " - log" << j;
+            }
+        }).detach();
     }
 }
 
 int main() {
-    AsyncLogging* asyncLog = new AsyncLogging("Log/test_log", 1024 * 1024 * 10);
-    Logger::setOutput(std::bind(&AsyncLogging::append, asyncLog, std::placeholders::_1, std::placeholders::_2));
+    g_asyncLog = std::make_unique<AsyncLogging>("stdout", 1024 * 1024);
+    g_asyncLog->start();
 
-    const int threadNum = 4;
-    const int logPerThread = 5000;
-    std::vector<std::thread> threads;
-    for (int i = 0; i < threadNum; i++)
-    {
-        threads.emplace_back(logFunc, i + 1, logPerThread);
-    }
+    Logger::setOutput(asyncOutput);
 
-    for (auto& t : threads)
-    {
-        t.join();
-    }
+    logFunc();
 
-    std::cout << "All logs submitted, waiting for flush..." << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for((std::chrono::seconds(5)));
 
-    asyncLog->stop();
-    delete asyncLog;
+    g_asyncLog->stop();
 
-    std::cout << "Log test finished. check output files in ./log/" << std::endl;
+    std::cout << "Logging test finished." << std::endl;
+
     return 0;
 }
