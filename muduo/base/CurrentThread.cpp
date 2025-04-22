@@ -1,13 +1,10 @@
 #include "CurrentThread.h"
-#include <csignal>
-#include <sys/syscall.h>
-#include <unistd.h>
 
 namespace CurrentThread 
 {
     __thread int t_cachedTid = 0;
 
-    void catchTid ()
+    void cacheTid ()
     {
         if (t_cachedTid == 0)
         {   

@@ -1,4 +1,6 @@
 #include <thread>
+#include "../base/CurrentThread.h"
+
 class EventLoop 
 {
 public:

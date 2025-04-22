@@ -1,5 +1,6 @@
 #include "Channel.h"
 #include <csignal>
+#include "../logging/Logging.h"
 
 const int Channel::kNoneEvent = 0;
 const int Channel::kReadEvent = POLL_IN | POLL_PRI;
