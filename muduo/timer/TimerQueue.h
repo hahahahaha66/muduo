@@ -5,6 +5,7 @@
 #include "../net/Channel.h"
 
 #include <functional>
+#include <sys/timerfd.h>
 #include <utility>
 #include <vector>
 #include <set>
