@@ -1,32 +1,35 @@
+#ifndef POLLER_H
+#define POLLER_H
+
+#include "../base/noncopyable.h"
+#include "Channel.h"
+#include "../base/Timestamp.h"
+
 #include <vector>
-#include <map>
-#include <poll.h>
-#include "EventLoop.h"
-struct pollfd;
+#include <unordered_map>
 
-class Channel;
-
-class Poller 
+class Poller : noncopyable
 {
 public:
     using ChannelList = std::vector<Channel*>;
 
     Poller(EventLoop* loop);
-    ~Poller();
+    virtual ~Poller() = default;
 
-    Timestamp poll(int timeoutMs, ChannelList* activeChannels);
+    virtual Timestamp poll(int timeoutMs, ChannelList* activeChannels);
+    virtual void updateChannel(Channel* channel) = 0;
+    virtual void removeChannel(Channel* channel) = 0;
 
-    void updateChannel(Channel* channel);
+    bool hasChannel(Channel* channel) const;
 
-    void assertInLoopChannel(){ ownerLoop_->assertInLoopThread(); }
+    static Poller* newDefaultPoller(EventLoop* Loop);
+
+protected:
+    using ChannelMap = std::unordered_map<int, Channel*>;
+    ChannelMap channels_;
 
 private:
-    void fillActiveChannels(int numEvents, ChannelList* activeChannels) const;
-
-    using PollFdList = std::vector<struct pollfd>;
-    using ChannelMap = std::map<int, Channel>;
-
-    EventLoop* ownweLoop_;
-    PollFdList pollfds_;
-    ChannelMap channels_;
+    EventLoop* ownerLoop_;
 };
+
+#endif 
