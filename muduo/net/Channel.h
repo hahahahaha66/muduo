@@ -52,7 +52,7 @@ public:
     bool isWriting() const { return events_ & kWriteEvent; }
     bool isReading() const { return events_ & kReadEvent; }
 
-    int index() { return index_; }  //Poller使用，记录该Channel是否被加入到Poller中
+    int index() { return index_; }  //Poller使用，记录该Channel是否被加入到Poller中，记录该Channel的状态
     void set_index(int idx) { index_ = idx; }  //记录该Channel已加入Poller
 
     EventLoop* ownerLoop() { return loop_; }  //返回所属的Eventloop

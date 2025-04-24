@@ -8,6 +8,7 @@
 #include <vector>
 #include <unordered_map>
 
+//抽象版本，提供大致的接口
 class Poller : noncopyable
 {
 public:
