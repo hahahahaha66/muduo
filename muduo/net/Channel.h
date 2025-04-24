@@ -36,7 +36,7 @@ public:
     //绑定一个对象的shared_ptr，用于检查对象是否还活着
     void tie(const std::shared_ptr<void>&);
 
-    int fd() const { return fd_; }  //返回文件描述符
+    int fd() const { return fd_; }  //返回channel对应的文件描述符
     int events() const { return events_; }  //返回监听的事件
     void set_revents(int revt) { revents_ = revt; }  //Poller通知我实际发生的事件
 
