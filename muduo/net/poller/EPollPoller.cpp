@@ -1,6 +1,4 @@
 #include "EPollPoller.h"
-#include "Channel.h"
-#include "EventLoop.h"
 
 #include <cstddef>
 #include <string.h>
