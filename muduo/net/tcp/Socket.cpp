@@ -22,6 +22,7 @@ void Socket::bindAddress(const InetAddress& localaddr)
 
 void Socket::listen()
 {
+    //最大允许1024个同时连接
     if (::listen(sockfd_, 1024) != 0)
     {
         LOG_FATAL << "listen sockfd:" << sockfd_ << " failed";
@@ -34,15 +35,18 @@ int Socket::accept(InetAddress* peeraddr)
     socklen_t len = sizeof(addr);
     ::memset(&addr, 0, sizeof(addr));
 
+    //设置非阻塞和关闭执行继承，并且accept4是原子操作
     int connfd = ::accept4(sockfd_, (sockaddr*)&addr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
     if (connfd >= 0)
     {
+        //保存新连接的sockaddr
         peeraddr->setSockAddr(addr);
     }
     else 
     {
         LOG_ERROR << "accept4() failed";
     }
+    //返回新连接的文件描述符
     return connfd;
 }
 
@@ -54,6 +58,7 @@ void Socket::shutdownWrite()
     }
 }
 
+//Nagel算法是为了解决"发送大量小包"导致的网络拥塞问题。
 void Socket::setTcpNoDelay(bool on)
 {
     int optval = on ? 1 : 0;
@@ -66,6 +71,7 @@ void Socket::setReuseAddr(bool on)
     ::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 }
 
+//设置后就可以实现多线程共享监听接口
 void Socket::setReusePort(bool on)
 {
     int optval = on ? 1 : 0;
