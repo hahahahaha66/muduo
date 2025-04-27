@@ -26,7 +26,7 @@ TcpServer::TcpServer(EventLoop* loop,
     : loop_(CheckLoopNotNull(loop)),
       inPort_(listenAddr.toIpPort()),
       name_(nameArg),
-      acceptor_(new Acceptor(loop, listenAddr, option == kReuseePort)),
+      acceptor_(new Acceptor(loop, listenAddr, option == kReusePort)),
       threadPool_(new EventLoopThreadPool(loop, name_)),
       connectionCallback_(),
       messageCallback_(),
@@ -35,6 +35,7 @@ TcpServer::TcpServer(EventLoop* loop,
       started_(0),
       nextConnId_(1)
 {
+    //管理新连接
     acceptor_->setNewConnectionCallback(
         std::bind(&TcpServer::newConnection, this, std::placeholders::_1, std::placeholders::_2));
 }
@@ -65,8 +66,9 @@ void TcpServer::start()
 
 void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 {
+    //获得下一个连接的EventLoop
     EventLoop* ioLoop = threadPool_->getNextLoop();
-    char buf[64] = {0};
+    char buf[64] = {0};  //名字
 
     snprintf(buf, sizeof(buf), "-%s#%d", inPort_.c_str(), nextConnId_);
     ++nextConnId_;
@@ -85,8 +87,11 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
     }
 
     InetAddress localAddr(local);
+    //建立一个新的TcpConnection
     TcpConnectionPtr conn(new TcpConnection(ioLoop, connName, sockfd, localAddr, peerAddr));
+    //存入
     connections_[connName] = conn;
+    //设置回调函数
     conn->setConnectionCallback(connectionCallback_);
     conn->setMessageCallback(messageCallback_);
     conn->setWriteCompleteCallback(writeCompleteCallback_);
