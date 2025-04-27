@@ -31,7 +31,7 @@ TcpConnection::TcpConnection(EventLoop* loop,
       peerAddr_(peerAddr),
       highWaterMark_(64 * 1024 * 1024)
 {
-    channel_->setReadCallback(std::bind(&TcpConnection::handleRead, this, std::placeholders::_1));
+    channel_->setReadCallback(std::bind(&TcpConnection::handleRead, this, std::placeholders::_1));  //使用占位符，表示还有一个参数
     channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
     channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
     channel_->setErrorCallback(std::bind(&TcpConnection::handleError, this));
@@ -55,6 +55,7 @@ void TcpConnection::send(const std::string& buf)
         }
         else
         {
+            //由于有多个重载版本，需要用函数指针来指明具体是哪个版本
             void(TcpConnection::*fp)(const void* data, size_t len) = &TcpConnection::sendInLoop;
             loop_->runInLoop(std::bind(fp, this, buf.c_str(), buf.size()));
         }
@@ -72,6 +73,7 @@ void TcpConnection::send(Buffer* buf)
         }
         else 
         {
+            //理由同上
             void (TcpConnection::*fp)(const std::string& massage) = &TcpConnection::sendInLoop;
             loop_->runInLoop(std::bind(fp, this, buf->retrieveAllAsString()));
         }
@@ -85,10 +87,11 @@ void TcpConnection::sendInLoop(const std::string& message)
 
 void TcpConnection::sendInLoop(const void* data, size_t len)
 {
-    ssize_t nwrote = 0;
-    size_t remaining = len;
+    ssize_t nwrote = 0;  //已写入字数
+    size_t remaining = len;  //剩余字数
     bool faultError = false;
 
+    //已断开连接，无法发送数据
     if (state_ == kDisconnected)
     {
         LOG_ERROR << "disconnected, give up writing";
@@ -101,12 +104,13 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
         if (nwrote >= 0)
         {
             remaining = len - nwrote;
+            //如果数据写完
             if (remaining == 0 && writecompletecallback_)
             {
                 loop_->queueInLoop(std::bind(writecompletecallback_, shared_from_this()));
             }
         }
-        else 
+        else  //报错
         {
             nwrote = 0;
             if (errno != EWOULDBLOCK)
@@ -120,6 +124,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
         }
     }
 
+    //如果数据未写完并且无错
     if (!faultError && remaining > 0)
     {
         size_t oldLen = outputBuffer_.readableBytes();
@@ -154,7 +159,7 @@ void TcpConnection::shutdownInLoop()
 void TcpConnection::connectEstablished()
 {
     setState(kConnected);
-    channel_->tie(shared_from_this());
+    channel_->tie(shared_from_this());  //强引用指针记录，防止析构
     channel_->enableReading();
     connectionCallback_(shared_from_this());
 }
@@ -175,6 +180,7 @@ void TcpConnection::handleRead(Timestamp receiveTime)
     int savedErrno = 0;
 
     ssize_t n = intputBuffer_.readFd(channel_->fd(), savedErrno);
+    //判断读取情况
     if (n > 0)
     {
         messageCallback_(shared_from_this(), &inputBuffer_, receiveTime);
