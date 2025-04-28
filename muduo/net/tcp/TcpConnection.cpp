@@ -179,7 +179,7 @@ void TcpConnection::handleRead(Timestamp receiveTime)
 {
     int savedErrno = 0;
 
-    ssize_t n = intputBuffer_.readFd(channel_->fd(), savedErrno);
+    ssize_t n = inputBuffer_.readFd(channel_->fd(), &savedErrno);
     //判断读取情况
     if (n > 0)
     {

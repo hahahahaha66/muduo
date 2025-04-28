@@ -37,6 +37,7 @@ public:
         retrieve(end - peek());
     }
 
+    //移动可读区块的指针
     void retrieve(size_t len)
     {
         //只读了缓冲区的部分长度
@@ -57,6 +58,7 @@ public:
         writerIndex_ = kCheapPrepend;    
     }
 
+    //获取可读区块的string但不移动可读区块的指针位置
     std::string GetBufferAllAsString()
     {
         size_t len = readableBytes();
@@ -64,11 +66,13 @@ public:
         return result;
     }
 
+    //retrieveAsString的外层包装
     std::string retrieveAllAsString()
     {
         return retrieveAsString(readableBytes());
     }
 
+    //获取可读区块的string但移动可读区块的指针位置
     std::string retrieveAsString(size_t len)
     {
         std::string result(peek(), len);
@@ -76,6 +80,7 @@ public:
         return result;
     }
 
+    //比较可写区块与len的大小
     void ensureWritableBytes(size_t len)
     {
         if (writableBytes() < len)
@@ -84,11 +89,13 @@ public:
         }
     }
 
+    //append的外层包装
     void append(const std::string& str)
     {
         append(str.data(), str.size());
     }
 
+    //在可写区块后追加字符串，并移动可写区块的指针
     void append(const char* data, size_t len)
     {
         ensureWritableBytes(len);
@@ -96,26 +103,32 @@ public:
         writerIndex_ += len;
     }
 
+    //用于找到一行的结束标志，按行解析受到的数据
     const char* findCRLF() const 
     {
         const char* crlf = std::search(peek(), beginWrite(), kCRLF, kCRLF + 2);
         return crlf == beginWrite() ? NULL : crlf;
     }
 
+    //返回可写区块的指针
     char* beginWrite()
     {
         return begin() + writerIndex_;
     }
 
+    //beginWrite的const版本
     const char* beginWrite() const
     {
         return begin() + writerIndex_;
     }
 
+    //从Fd上读取数据
     ssize_t readFd(int fd, int* saveErrno);
+    //想Fd写入数据
     ssize_t writeFd(int fd, int* saveErrno);
 
 private:
+    //返回缓冲区开始的位置
     char* begin()
     {
         return &(*buffer_.begin());
@@ -128,23 +141,25 @@ private:
 
     void makeSpace(int len)
     {
+        //如果剩余空间不足
         if (writableBytes() + prependableBytes() < len + kCheapPrepend)
         {
             buffer_.resize(writerIndex_ + len);
         }
-        else 
+        else //如果可写加上头部空间足够
         {
             size_t readable = readableBytes();
+            //将已写入的空间向前移动
             std::copy(begin() + readerIndex_, begin() + writerIndex_, begin() + kCheapPrepend);
             readerIndex_ = kCheapPrepend;
             writerIndex_ = readerIndex_ + readable;
         }
     }
 
-    std::vector<char> buffer_;
-    size_t readerIndex_;
-    size_t writerIndex_;
-    static const char kCRLF[];
+    std::vector<char> buffer_;  //缓冲区
+    size_t readerIndex_;  //可读指针
+    size_t writerIndex_;  //可写指针
+    static const char kCRLF[];  //表示一行结束的结束符
 };
 
 #endif

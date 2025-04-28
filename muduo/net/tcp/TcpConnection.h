@@ -4,7 +4,7 @@
 #include "../../base/noncopyable.h"
 #include "../../base/Timestamp.h"
 #include "Callback.h"
-//#include "Buffer.h"
+#include "../Buffer.h"
 #include "InetAddress.h"
 #include "Socket.h"
 
@@ -118,8 +118,8 @@ private:
     
     size_t highWaterMark_;  //水位线，到达这个数量就会触发一个回调函数
 
-    // Buffer inputBuffer_;
-    // Buffer outputBuffer_;
+    Buffer inputBuffer_;
+    Buffer outputBuffer_;
 
 };
 
