@@ -130,6 +130,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
         size_t oldLen = outputBuffer_.readableBytes();
         if (oldLen + remaining >= highWaterMark_ && oldLen < highWaterMark_ && highwatermarkcallback_)
         {
+            //将未写完的事件包装成任务在下一次处理时继续写入
             loop_->queueInLoop(std::bind(highwatermarkcallback_, shared_from_this(), oldLen + remaining));
             if (!channel_->isWriting())
             {
@@ -161,7 +162,7 @@ void TcpConnection::connectEstablished()
     setState(kConnected);
     channel_->tie(shared_from_this());  //强引用指针记录，防止析构
     channel_->enableReading();
-    connectionCallback_(shared_from_this());
+    connectionCallback_(shared_from_this());  //通知上层应用更新自身状态
 }
 
 void TcpConnection::connectDestroyed()
@@ -170,7 +171,7 @@ void TcpConnection::connectDestroyed()
     {
         setState(kDisconnected);
         channel_->disableAll();
-        connectionCallback_(shared_from_this());
+        connectionCallback_(shared_from_this());  //通知上层应用更新自身状态
     }
     channel_->remove();
 }

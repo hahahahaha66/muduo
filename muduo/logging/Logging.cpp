@@ -58,7 +58,7 @@ Logger::Impl::Impl(Logger::LogLevel level, int savedErrno, const char* file, int
 {
     formatTime();  //写入当前时间
 
-    stream_ << GeneralTemplate(getLevelName[level], 6);  //写入日志等级
+    stream_ << GeneralTemplate(getLevelName[level], 6) << " ";  //写入日志等级
     if (savedErrno != 0)  //检查有无错误，有则输出
     {
         stream_ << getErrnoMsg(savedErrno) << " (errno=" << savedErrno << ")6 nm";
