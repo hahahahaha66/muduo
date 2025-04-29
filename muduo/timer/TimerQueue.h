@@ -13,6 +13,8 @@
 class EventLoop;
 class Timer;
 
+//创建一个timefd,并绑定到一个channel,将channel设为epoll感兴趣的事件
+//当定时器到期时，对应文件描述变为可读或可写，EventLoop调用回调函数处理超时事件
 class TimerQueue
 {
 public:
@@ -34,7 +36,10 @@ private:
 
     void resetTimerfd(int timerfd_, Timestamp expiration);  //重新设置超时时间
 
+    //移除超时的定时器
     std::vector<Entry> getExpired(Timestamp now);
+    
+    //重新设置定时器的时间
     void reset(const std::vector<Entry>& expired, Timestamp now);
 
     bool insert(Timer* timer_);  //向TimerList中插入一个新的定时器，返回是否是新的最早的定时器

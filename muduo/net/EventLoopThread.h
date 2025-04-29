@@ -30,7 +30,7 @@ private:
     void threadFunc();
 
     EventLoop* loop_;  //EventLoop对象
-    bool exiting_;  //推出标志
+    bool exiting_;  //退出标志
     Thread thread_;  //线程类
     std::mutex mutex_;  //互斥锁
     std::condition_variable cond_;  //条件变量，通知startLoopEventLoop已创建完

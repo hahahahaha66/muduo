@@ -22,17 +22,20 @@ Channel::~Channel()
 {
 }
 
-
 void Channel::tie(const std::shared_ptr<void> &obj)
 {
     tie_ = obj;
     tied_ = true;
 }
 
-
 void Channel::update()
 {
     loop_->updateChannel(this);
+}
+
+void Channel::remove()
+{
+    loop_->removeChannel(this);
 }
 
 //受到Poller通知后，检查tied,并调用handleEventWithGuard

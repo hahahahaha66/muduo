@@ -98,11 +98,11 @@ private:
     int wakeupFd_;  //存储eventfd,用于线程间的事件通知
     std::unique_ptr<Channel> wakeupChannel_;  //绑定wakeupFd_，封装成Channel,能加入到epoll
 
-   ChannelList activeChannels_;  //活跃的channel
-   Channel* currentActiveChannel_;  //正在处理的活跃的channel
+    ChannelList activeChannels_;  //活跃的channel
+    Channel* currentActiveChannel_;  //正在处理的channel
 
-   std::mutex mutex_;  //线程锁
-   std::vector<Functor> pendingFunctors_;  //保存待执行的任务
+    std::mutex mutex_;  //线程锁
+    std::vector<Functor> pendingFunctors_;  //保存待执行的任务
 };
 
 #endif

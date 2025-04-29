@@ -140,11 +140,11 @@ void EPollPoller::update(int operation, Channel* channel)
     {
         if (operation == EPOLL_CTL_DEL)
         {
-            LOG_ERROR << "epoll_ctl() del error:" << errno;
+            LOG_ERROR << " epoll_ctl() del error: " << errno;
         }
         else 
         {
-            LOG_FATAL << "epoll_ctl add/mod error:" << errno;
+            LOG_FATAL << " epoll_ctl add/mod error: " << errno;
         }
     }
 }

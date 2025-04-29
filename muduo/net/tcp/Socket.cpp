@@ -16,7 +16,7 @@ void Socket::bindAddress(const InetAddress& localaddr)
 {
     if (::bind(sockfd_, (sockaddr*)localaddr.getSockAddr(), sizeof(sockaddr_in)) != 0)
     {
-        LOG_FATAL << "bind sockfd:" << sockfd_ << " failed";
+        LOG_FATAL << " bind sockfd: " << sockfd_ << " failed";
     }
 }
 
@@ -25,7 +25,7 @@ void Socket::listen()
     //最大允许1024个同时连接
     if (::listen(sockfd_, 1024) != 0)
     {
-        LOG_FATAL << "listen sockfd:" << sockfd_ << " failed";
+        LOG_FATAL << " listen sockfd: " << sockfd_ << " failed";
     }
 }
 
@@ -44,7 +44,7 @@ int Socket::accept(InetAddress* peeraddr)
     }
     else 
     {
-        LOG_ERROR << "accept4() failed";
+        LOG_ERROR << " accept4() failed";
     }
     //返回新连接的文件描述符
     return connfd;
@@ -54,7 +54,7 @@ void Socket::shutdownWrite()
 {
     if (::shutdown(sockfd_, SHUT_WR) < 0)
     {
-        LOG_ERROR << "shutdownWrite error";
+        LOG_ERROR << " shutdownWrite error";
     }
 }
 

@@ -12,6 +12,7 @@ class InetAddress
 public:
     //未初始化默认ip为127.0.0.1
     explicit InetAddress(uint16_t port = 0, std::string ip = "127.0.0.1");
+    
     explicit InetAddress(const sockaddr_in& addr)
         :addr_(addr)
     {

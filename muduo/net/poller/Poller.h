@@ -15,10 +15,10 @@ public:
     using ChannelList = std::vector<Channel*>;
 
     Poller(EventLoop* loop);
-    virtual ~Poller() = default;
+    virtual ~Poller();
 
     //交给派生类实现的接口
-    virtual Timestamp poll(int timeoutMs, ChannelList* activeChannels);
+    virtual Timestamp poll(int timeoutMs, ChannelList* activeChannels) = 0;
     virtual void updateChannel(Channel* channel) = 0;
     virtual void removeChannel(Channel* channel) = 0;
 
