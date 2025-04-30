@@ -68,28 +68,28 @@ void Connector::connect()
     int savedErrno = (ret == 0) ? 0 : errno;
     switch (savedErrno)
     {
-    case 0:
-    case EINPROGRESS:
-    case EINTR:
-    case EISCONN:
+    case 0:  //连接成功
+    case EINPROGRESS:  //正在连接
+    case EINTR:  //被系统信号中断
+    case EISCONN:  //连接已建立
         connecting(sockfd);
         break;
 
-    case EAGAIN:
-    case EADDRINUSE:
-    case EADDRNOTAVAIL:
-    case ECONNREFUSED:
-    case ENETUNREACH:
+    case EAGAIN:  //资源暂不可用
+    case EADDRINUSE:  //地址正在使用
+    case EADDRNOTAVAIL:  //地址不可用
+    case ECONNREFUSED:  //连接被拒绝
+    case ENETUNREACH:  //网络不可达
         retry(sockfd);
         break;
 
-    case EACCES:
-    case EPERM:
-    case EAFNOSUPPORT:
-    case EALREADY:
-    case EBADF:
-    case EFAULT:
-    case ENOTSOCK:
+    case EACCES:  //权限不足
+    case EPERM:  //操作不允许
+    case EAFNOSUPPORT:  //地址族不支持
+    case EALREADY:  //操作已在进行中
+    case EBADF:  //文件描述符无效
+    case EFAULT:  //无效地址
+    case ENOTSOCK:  //文件描述符不是一个套接字
         LOG_ERROR << "connect error in Connector::startInLoop " << savedErrno;
         ::close(sockfd);
         break;
@@ -133,6 +133,7 @@ void Connector::resetChannel()
     channel_.reset();
 }
 
+//获取套接字的本地地址
 struct sockaddr_in6 getLocalAddr(int sockfd)
 {
   struct sockaddr_in6 localaddr;
@@ -145,6 +146,7 @@ struct sockaddr_in6 getLocalAddr(int sockfd)
   return localaddr;
 }
 
+//获取套接字的对端地址
 struct sockaddr_in6 getPeerAddr(int sockfd)
 {
   struct sockaddr_in6 peeraddr;
@@ -157,6 +159,7 @@ struct sockaddr_in6 getPeerAddr(int sockfd)
   return peeraddr;
 }
 
+//用于检查是否发生了自连接
 bool isSelfConnect(int sockfd)
 {
   struct sockaddr_in6 localaddr = getLocalAddr(sockfd);
@@ -179,6 +182,7 @@ bool isSelfConnect(int sockfd)
   }
 }
 
+//获取套接字的错误状态
 int getSocketError(int sockfd)
 {
     int optval;
@@ -225,11 +229,11 @@ void Connector::handleWrite()
             }
         }
     }
-    else
-    {
-        // what happened?
-        assert(state_ == kDisconnected);
-    }
+    // else
+    // {
+    //     // what happened?
+    //     assert(state_ == kDisconnected);
+    // }
 }
 
 void Connector::handleError()
@@ -253,7 +257,7 @@ void Connector::retry(int sockfd)
         LOG_INFO << "Connector::retry - Retry connecting to" << serverAddr_.toIpPort()
                  << " in " << retryDelayMs_ << " milliseconds.  ";
         loop_->runAfter(retryDelayMs_/1000.0, std::bind(&Connector::startInLoop, shared_from_this()));
-        retryDelayMs_ = std::min(retryDelayMs_ * 2, kMaxRetryDelayMs);
+        retryDelayMs_ = std::min(retryDelayMs_ * 2, kMaxRetryDelayMs);  //获取重试时间
     }
     else  
     {
