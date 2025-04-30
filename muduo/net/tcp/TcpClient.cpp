@@ -48,11 +48,11 @@ TcpClient::~TcpClient()
     bool unique = false;
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        unique = connection_.unique();
-        conn = connection_;
+        unique = connection_.unique();  //判断是否是唯一引用者
+        conn = connection_;  //增加引用计数
     }
 
-    if (conn)
+    if (conn)  //还存在连接对象
     {
         CloseCallback cb = std::bind(&detail::removeConnection, loop_, std::placeholders::_1);
         loop_->runInLoop(std::bind(&TcpConnection::setCloseCallback, conn, cb));
@@ -61,7 +61,7 @@ TcpClient::~TcpClient()
             conn->forceClose();
         }
     }
-    else 
+    else  //只用当前一个连接对象
     {
         connector_->stop();
         loop_->runAfter(1, std::bind(&detail::removeConnector, connector_));
@@ -97,4 +97,40 @@ void TcpClient::stop()
 void TcpClient::newConnection(int sockfd)
 {
     InetAddress peerAddr(Connector::getPeerAddr(sockfd));
+    char buf[32];
+    snprintf(buf, sizeof(buf), ":%s%d", peerAddr.toIpPort().c_str(), nextConnId_);
+    ++nextConnId_;
+    std::string connName = name_ + buf;
+
+    InetAddress localAddr(Connector::getLocalAddr(sockfd));
+
+    //建立新的TcpConnection
+    TcpConnectionPtr conn(new TcpConnection(loop_, connName, sockfd, localAddr, peerAddr));
+
+    //设置回调函数
+    conn->setConnectionCallback(connectionCallback_);
+    conn->setMessageCallback(messageCallback_);
+    conn->setWriteCompleteCallback(writeCompleteCallback_);
+    conn->setCloseCallback(std::bind(&TcpClient::removeConnection, this, std::placeholders::_1));
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        connection_ = conn;
+    }
+    conn->connectEstablished();
+}
+
+void TcpClient::removeConnection(const TcpConnectionPtr& conn)
+{
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        connection_.reset();
+    }
+
+    loop_->queueInLoop(std::bind(&TcpConnection::connectDestroyed, conn));
+    if (retry_ && connect_)
+    {
+        LOG_INFO << "TcpClient::connect[" << name_ << "] - Reconnecting to " << connector_->serverAddress().toIpPort();
+        connector_->restart();
+    }
 }

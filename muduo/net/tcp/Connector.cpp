@@ -134,7 +134,7 @@ void Connector::resetChannel()
 }
 
 //获取套接字的本地地址
-struct sockaddr_in getLocalAddr(int sockfd)
+struct sockaddr_in Connector::getLocalAddr(int sockfd)
 {
     struct sockaddr_in localaddr;
     memset(&localaddr, 0, sizeof localaddr);
@@ -148,7 +148,7 @@ struct sockaddr_in getLocalAddr(int sockfd)
 
 
 //获取套接字的对端地址
-struct sockaddr_in getPeerAddr(int sockfd)
+struct sockaddr_in Connector::getPeerAddr(int sockfd)
 {
     struct sockaddr_in peeraddr;
     memset(&peeraddr, 0, sizeof peeraddr);
@@ -162,7 +162,7 @@ struct sockaddr_in getPeerAddr(int sockfd)
 
 
 //用于检查是否发生了自连接
-bool isSelfConnect(int sockfd)
+bool Connector::isSelfConnect(int sockfd)
 {
     struct sockaddr_in localaddr = getLocalAddr(sockfd);
     struct sockaddr_in peeraddr = getPeerAddr(sockfd);
@@ -172,7 +172,7 @@ bool isSelfConnect(int sockfd)
 }
 
 //获取套接字的错误状态
-int getSocketError(int sockfd)
+int Connector::getSocketError(int sockfd)
 {
     int optval;
     socklen_t optlen = static_cast<socklen_t>(sizeof optval);
