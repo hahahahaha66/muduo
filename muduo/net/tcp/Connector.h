@@ -33,6 +33,18 @@ public:
     //获取服务器地址
     const InetAddress& serverAddress() const { return serverAddr_; }
 
+    //获取套接字的本地地址
+    static struct sockaddr_in getLocalAddr(int sockfd);
+
+    //获取套接字的对端地址
+    static struct sockaddr_in getPeerAddr(int sockfd);
+
+    //用于检查是否发生了自连接
+    static bool isSelfConnect(int sockfd);
+
+    //获取套接字的错误状态
+    static int getSocketError(int sockfd);
+
 private:
     //表示连接状态
     enum States

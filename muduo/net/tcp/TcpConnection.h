@@ -59,6 +59,11 @@ public:
 
     //半关闭连接，只关闭写端
     void shutdown();
+    
+    //强制关闭
+    void forceClose();
+
+    void forceCloseInLoop();
 
     //设置自定义的回调函数，控制事件发生后的行为
     void setConnectionCallback(const ConnectionCallback& cb) { connectionCallback_ = cb; }

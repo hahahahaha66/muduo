@@ -157,6 +157,23 @@ void TcpConnection::shutdownInLoop()
     }
 }
 
+void TcpConnection::forceClose()
+{
+    if (state_ == kConnected || state_ == kDisconnecting)
+    {
+        setState(kDisconnecting);
+        loop_->queueInLoop(std::bind(&TcpConnection::forceCloseInLoop, shared_from_this()));
+    }
+}
+
+void TcpConnection::forceCloseInLoop()
+{
+    if (state_ == kConnected || state_ == kDisconnecting)
+    {
+        handleClose();
+    }
+}
+
 void TcpConnection::connectEstablished()
 {
     setState(kConnected);

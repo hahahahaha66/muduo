@@ -134,52 +134,41 @@ void Connector::resetChannel()
 }
 
 //获取套接字的本地地址
-struct sockaddr_in6 getLocalAddr(int sockfd)
+struct sockaddr_in getLocalAddr(int sockfd)
 {
-  struct sockaddr_in6 localaddr;
-  memset(&localaddr, 0, sizeof localaddr);
-  socklen_t addrlen = static_cast<socklen_t>(sizeof localaddr);
-  if (::getsockname(sockfd, (sockaddr*)(&localaddr), &addrlen) < 0)
-  {
-    LOG_ERROR << "sockets::getLocalAddr";
-  }
-  return localaddr;
+    struct sockaddr_in localaddr;
+    memset(&localaddr, 0, sizeof localaddr);
+    socklen_t addrlen = static_cast<socklen_t>(sizeof localaddr);
+    if (::getsockname(sockfd, (sockaddr*)(&localaddr), &addrlen) < 0)
+    {
+        LOG_ERROR << "sockets::getLocalAddr";
+    }
+    return localaddr;
 }
 
+
 //获取套接字的对端地址
-struct sockaddr_in6 getPeerAddr(int sockfd)
+struct sockaddr_in getPeerAddr(int sockfd)
 {
-  struct sockaddr_in6 peeraddr;
-  memset(&peeraddr,0, sizeof peeraddr);
-  socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
-  if (::getpeername(sockfd, (sockaddr*)(&peeraddr), &addrlen) < 0)
-  {
-    LOG_ERROR << "sockets::getPeerAddr";
-  }
-  return peeraddr;
+    struct sockaddr_in peeraddr;
+    memset(&peeraddr, 0, sizeof peeraddr);
+    socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
+    if (::getpeername(sockfd, (sockaddr*)(&peeraddr), &addrlen) < 0)
+    {
+        LOG_ERROR << "sockets::getPeerAddr";
+    }
+    return peeraddr;
 }
+
 
 //用于检查是否发生了自连接
 bool isSelfConnect(int sockfd)
 {
-  struct sockaddr_in6 localaddr = getLocalAddr(sockfd);
-  struct sockaddr_in6 peeraddr = getPeerAddr(sockfd);
-  if (localaddr.sin6_family == AF_INET)
-  {
-    const struct sockaddr_in* laddr4 = reinterpret_cast<struct sockaddr_in*>(&localaddr);
-    const struct sockaddr_in* raddr4 = reinterpret_cast<struct sockaddr_in*>(&peeraddr);
-    return laddr4->sin_port == raddr4->sin_port
-        && laddr4->sin_addr.s_addr == raddr4->sin_addr.s_addr;
-  }
-  else if (localaddr.sin6_family == AF_INET6)
-  {
-    return localaddr.sin6_port == peeraddr.sin6_port
-        && memcmp(&localaddr.sin6_addr, &peeraddr.sin6_addr, sizeof localaddr.sin6_addr) == 0;
-  }
-  else
-  {
-    return false;
-  }
+    struct sockaddr_in localaddr = getLocalAddr(sockfd);
+    struct sockaddr_in peeraddr = getPeerAddr(sockfd);
+    
+    // 判断是否是自连接（IPV4）
+    return localaddr.sin_port == peeraddr.sin_port && localaddr.sin_addr.s_addr == peeraddr.sin_addr.s_addr;
 }
 
 //获取套接字的错误状态
