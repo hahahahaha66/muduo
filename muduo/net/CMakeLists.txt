@@ -23,6 +23,9 @@ set(NET_TCP_SRC
     tcp/Socket.cpp
     tcp/TcpConnection.cpp
     tcp/TcpServer.cpp
+    tcp/Connector.cpp
+    tcp/TcpClient.cpp
+    tcp/Callback.cpp
 )
 
 # 汇总

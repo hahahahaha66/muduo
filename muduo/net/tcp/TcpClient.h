@@ -40,7 +40,7 @@ private:
     void removeConnection(const TcpConnectionPtr& conn);
 
     EventLoop* loop_;  //TcpClient所属的事件循环
-    ConnectorPtr  connector_;  //Connector指针，基类负责底层功能的实现
+    ConnectorPtr connector_;  //Connector指针，基类负责底层功能的实现
     const std::string name_;  //客户端名字
     ConnectionCallback connectionCallback_;  //连接成功后回调
     MessageCallback messageCallback_;   //接收到消息的回调函数
