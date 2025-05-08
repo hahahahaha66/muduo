@@ -32,6 +32,16 @@ public:
         return connection_;
     }
 
+    EventLoop* getLoop() const { return loop_; }
+    bool retry() const { return retry_; }
+    void enableRetry() { retry_ = true; }
+
+    const std::string& name() const { return name_; }
+
+    void setConnectionCallback(ConnectionCallback cb) { connectionCallback_ = std::move(cb); }
+    void setMessageCallback(MessageCallback cb) { messageCallback_ = std::move(cb); }
+    void setWriteCompleteCallback(WriteCompleteCallback cb) { writeCompleteCallback_ = std::move(cb); }
+
 private:
     //连接建立时调用，创建新的TcpConnection添加到TcpClient
     void newConnection(int sockfd);
@@ -53,7 +63,5 @@ private:
     TcpConnectionPtr connection_ ;  //TcpConnection连接
 
 };
-
-
 
 #endif

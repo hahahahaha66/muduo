@@ -5,6 +5,7 @@
 #include "FixedBuffer.h"
 
 #include <string>
+#include <bits/types.h>
 
 class GeneralTemplate : noncopyable
 {
@@ -31,6 +32,8 @@ public:
     const Buffer& buffer() const { return buffer_; }  //获取完整的日志
     void resetBuffer() { buffer_.reset(); }     //重置日志
     
+    void formatPointer(const void* data);
+
     //以下是重载数字及字符，确保所有的输入都能成功到缓冲区内
     LogStream& operator<<(short);
     LogStream& operator<<(unsigned short);

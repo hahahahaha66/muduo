@@ -36,13 +36,13 @@ TcpConnection::TcpConnection(EventLoop* loop,
     channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
     channel_->setErrorCallback(std::bind(&TcpConnection::handleError, this));
 
-    LOG_INFO << "TcpConnection::ctor[" << name_.c_str() << "] at fd = " << sockfd;
+    LOG_INFO << "TcpConnection::ctor[" << name_.data() << "] at fd = " << sockfd;
     socket_->setKeepAlive(true);
 }
 
 TcpConnection::~TcpConnection()
 {
-    LOG_INFO << "TcpConnection::dtor[" << name_.c_str() << "] at fd " << channel_->fd() << " states= " << static_cast<int>(state_);
+    LOG_INFO << "TcpConnection::dtor[" << name_.data() << "] at fd " << channel_->fd() << " states= " << static_cast<int>(state_);
 }
 
 void TcpConnection::send(const std::string& buf)
@@ -51,13 +51,20 @@ void TcpConnection::send(const std::string& buf)
     {
         if (loop_->isInLoopThread())
         {
-            sendInLoop(buf.c_str(), buf.size());
+            sendInLoop(buf.data(), buf.size());
         }
         else
         {
+            //这里注释的版本有乱码的bug,原因在于异步执行的情况下传递的buf.c_str可能已经被销毁
+            //导致真正实现的时候指针已经指向无效或错误的内存
+
             //由于有多个重载版本，需要用函数指针来指明具体是哪个版本
-            void(TcpConnection::*fp)(const void* data, size_t len) = &TcpConnection::sendInLoop;
-            loop_->runInLoop(std::bind(fp, this, buf.c_str(), buf.size()));
+            // void(TcpConnection::*fp)(const void* data, size_t len) = &TcpConnection::sendInLoop;
+            // loop_->runInLoop(std::bind(fp, this, buf.c_str(), buf.size()));
+            std::string message(buf);  // 拷贝一份，延长生命周期
+            loop_->runInLoop([this, message]() {
+                sendInLoop(message.data(), message.size());
+            });
         }
     }
 }
@@ -73,9 +80,15 @@ void TcpConnection::send(Buffer* buf)
         }
         else 
         {
+            //这里也是，由于生命周期的管理不当，导致真正实现的时候指针已经指向无效或错误的内存
+
             //理由同上
-            void (TcpConnection::*fp)(const std::string& massage) = &TcpConnection::sendInLoop;
-            loop_->runInLoop(std::bind(fp, this, buf->retrieveAllAsString()));
+            // void (TcpConnection::*fp)(const std::string& massage) = &TcpConnection::sendInLoop;
+            // loop_->runInLoop(std::bind(fp, this, buf->retrieveAllAsString()));
+            std::string message = buf->retrieveAllAsString();  // 拷贝
+            loop_->runInLoop([this, message]() {
+                sendInLoop(message);
+            });
         }
     }
 }

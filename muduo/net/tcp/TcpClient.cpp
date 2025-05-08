@@ -38,12 +38,12 @@ TcpClient::TcpClient(EventLoop* loop, const InetAddress& serverAddr, const std::
       nextConnId_(1)
 {
     connector_->setNewConnectionCallback(std::bind(&TcpClient::newConnection, this, std::placeholders::_1));
-    LOG_INFO << "TcpClinet::TcpLient[" << name_ << "] - connector " << connector_.get();
+    LOG_INFO << "TcpClinet::TcpLient[" << name_ << "] - connector " << static_cast<const void*>(connector_.get());
 }
 
 TcpClient::~TcpClient()
 {
-    LOG_INFO << "TcpClient::~TcpClient[" << name_ << "] - connector " << connector_.get();
+    LOG_INFO << "TcpClient::~TcpClient[" << name_ << "] - connector " << static_cast<const void*>(connector_.get());
     TcpConnectionPtr conn;
     bool unique = false;
     {

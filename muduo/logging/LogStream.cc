@@ -1,6 +1,7 @@
 #include "LogStream.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <cstdio>
 
 //作者奇思：利用索引，简化了负数的判断
@@ -108,8 +109,10 @@ LogStream& LogStream::operator<<(char c)
 
 LogStream& LogStream::operator<<(const void* data)
 {
-    *this << static_cast<const char*>(data);
+    formatPointer(data);
     return *this;
+    // *this << static_cast<const char*>(data);
+    // return *this;
 }
 
 LogStream& LogStream::operator<<(const char* str)
@@ -147,3 +150,12 @@ LogStream& LogStream::operator<<(const GeneralTemplate& g)
     buffer_.append(g.data_, g.len_);
     return *this;
 }
+
+void LogStream::formatPointer(const void* p) {
+    __intptr_t v = reinterpret_cast<__intptr_t>(p);
+    if (buffer_.avail() >= kMaxNumericSize) {
+      char* buf = buffer_.current();
+      snprintf(buf, kMaxNumericSize, "0x%lx", v);  // 或使用 PRIxPTR 更安全
+      buffer_.add(strlen(buf));
+    }
+  }
