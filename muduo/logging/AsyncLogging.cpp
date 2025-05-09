@@ -34,6 +34,10 @@ void AsyncLogging::append(const char* logline, int len)
 {
     std::lock_guard<std::mutex> lock(mutex_);
 
+    // if (len <= 0 || (strspn(logline, "\r\n\t ") == len)) {
+    //     return;  // 忽略空日志内容
+    // }
+
     if (currentBuffer_->avail() > len)  //如果缓冲区剩余空间足够，直接写入
     {
         currentBuffer_->append(logline, len);
@@ -58,7 +62,7 @@ void AsyncLogging::append(const char* logline, int len)
 
 void AsyncLogging::threadFunc()
 {
-    LogFile output(basename_, rollSize_, false);  //创建日志文件
+    LogFile output(basename_, rollSize_, flushInterval_);  //创建日志文件
     
     //对象池思想，创建两个缓冲区，避免频繁的创建和销毁buffer
     BufferPtr newBuffer1(new Buffer);

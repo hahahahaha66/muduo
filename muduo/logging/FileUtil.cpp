@@ -1,5 +1,6 @@
 #include "FileUtil.h"
 #include "Logging.h"
+#include <cstdio>
 
 
 FileUtil::FileUtil(const std::string& fileName) 
@@ -33,6 +34,7 @@ FileUtil::~FileUtil()
 void FileUtil::append(const char* data, size_t len)
 {
     size_t written = 0;
+    printf("%s", data);
 
     while (written != len)
     {
@@ -58,5 +60,6 @@ void FileUtil::flush()
 
 size_t FileUtil::write(const char* data, size_t len)
 {
+    
     return ::fwrite_unlocked(data, 1, len, fp_);  //线程不安全，但效率更高
 }

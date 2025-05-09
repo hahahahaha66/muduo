@@ -23,7 +23,9 @@ public:
     //追加缓冲区字符串
     void append(const char* buf, size_t len)
     {
-        if (static_cast<size_t>(avail() > len))
+        assert(len <= static_cast<size_t>(avail()));
+        
+        if (static_cast<size_t>(avail()) >= len)
         {
             memcpy(cur_, buf, len);
             cur_ += len;
@@ -31,7 +33,7 @@ public:
     }
 
     const char* data() const { return data_; }  //获取缓冲区指针
-    int length() const { return static_cast<int>(end() - data_); }  //获取缓冲区长度
+    int length() const { return static_cast<int>(cur_ - data_); }  //获取缓冲区长度
 
     char* current() { return cur_; }  //获得缓冲区当前字符
     int avail() const { return static_cast<int>(end() - cur_); }  //获取当前缓冲区的剩余长度

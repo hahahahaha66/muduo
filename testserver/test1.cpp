@@ -2,11 +2,31 @@
 #include "../muduo/net/tcp/InetAddress.h"
 #include "../muduo/net//tcp/TcpServer.h"
 #include "../muduo/net/Channel.h"
+#include "../muduo/logging/LogFile.h"
+#include "../muduo/logging/AsyncLogging.h"
+
 #include <cstddef>
 #include <functional>
 #include <iomanip>  // std::setw, std::setfill
+#include <memory>
 #include <sstream>  // std::ostringstream
+#include <csignal>
 
+std::unique_ptr<AsyncLogging> asynclog;
+
+void asyncOutput(const char* msg, int len)
+{
+    //std::cout << "Log length: " << len << std::endl;
+
+    if (len > 0) {
+        asynclog->append(msg, len);
+
+        // 检查 msg 是否已经包含 \n，若无再追加
+        if (msg[len - 1] != '\n') {
+            asynclog->append("\n", 1);
+        }
+    }
+}
 
 class EchoServer{
 public:
@@ -19,42 +39,18 @@ public:
         server_.setThreadNum(3);
     }
 
+    ~EchoServer()
+    {
+    }
+
     void start()
     {
         server_.start();
     }
 
-    void dumpBufferHex(const char* data, size_t len) {
-        std::ostringstream oss;
-        oss << ">>> Received " << len << " bytes:\n";
-    
-        for (size_t i = 0; i < len; ++i) {
-            if (i % 16 == 0)
-                oss << std::setw(4) << std::setfill('0') << std::hex << i << ": ";
-    
-            oss << std::setw(2) << std::setfill('0') << std::hex << (static_cast<unsigned int>(data[i]) & 0xff) << " ";
-    
-            if ((i + 1) % 16 == 0)
-                oss << "\n";
-        }
-    
-        if (len % 16 != 0)
-            oss << "\n";
-    
-        // 打印可读字符
-        oss << ">>> As string: ";
-        for (size_t i = 0; i < len; ++i) {
-            char ch = data[i];
-            if (isprint(static_cast<unsigned char>(ch)) || ch == '\n')
-                oss << ch;
-            else
-                oss << '.';
-        }
-    
-        LOG_INFO << "\n" << oss.str();
-    }
 
 private:
+    
     void onConnection(const TcpConnectionPtr& conn)
     {
         if (conn->connected())
@@ -68,7 +64,7 @@ private:
         const char* data = buf->peek();
         size_t len = buf->readableBytes();
 
-        dumpBufferHex(data, len);
+        //dumpBufferHex(data, len);
 
         while (true) {
             const char* eol = static_cast<const char*>(
@@ -88,7 +84,13 @@ private:
 
 };
 
+
 int main() {
+    asynclog = std::make_unique<AsyncLogging>("test", 500 * 1000 * 1000);
+
+    Logger::setOutput(asyncOutput);
+    asynclog->start();
+
     EventLoop loop;
 
     InetAddress addr(8080);

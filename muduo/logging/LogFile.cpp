@@ -1,5 +1,6 @@
 #include "LogFile.h"
 #include "FileUtil.h"
+#include <ctime>
 #include <memory>
 
 LogFile::LogFile(const std::string& basename,
@@ -63,7 +64,7 @@ void LogFile::flush()  //手动刷新
 
 bool LogFile::rollFile()  //创建新日志文件
 {   
-    time_t now = 0;
+    time_t now = ::time(NULL);
     //把当前的秒数除一天的秒数，由于计算机是整数除法，余数，也就是当天的秒数就被舍去了，再乘回来，就是当天零点的时间
     time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;  
      
@@ -111,7 +112,7 @@ std::string LogFile::getLogFileName(const std::string& basename, time_t* now)
     strftime(timebuf, sizeof timebuf, ".%Y%m%d-%H%M%S", &tm);
     filename += timebuf;
 
-    filename += ".log";
+    filename += ".txt";
 
     return filename;
 }
