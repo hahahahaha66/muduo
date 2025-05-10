@@ -43,6 +43,8 @@ void Channel::handleEvent(Timestamp receiveTime)
 {
     if (tied_)
     {
+        //这里将weak_ptr升级为share_ptr确保在回调函数运行期间连接一直存在
+        //重点注意这里的升权操作
         std::shared_ptr<void> guard = tie_.lock();
         //如果guard为空，说明Channel的TcpConnection对象已经不在了
         if (guard)

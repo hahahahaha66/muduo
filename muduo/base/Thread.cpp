@@ -1,5 +1,6 @@
 #include "Thread.h"
 #include "CurrentThread.h"
+
 #include <cstdio>
 #include <memory>
 #include <semaphore.h>
@@ -28,16 +29,17 @@ Thread::~Thread()
 void Thread::start()
 {
     started_ = true;
+    //使用信号量来通知和唤醒
     sem_t sem;
     sem_init(&sem, false, 0);
     thread_ = std::shared_ptr<std::thread>(new std::thread([&](){
         tid_ = CurrentThread::tid();    //子线程的线程id
 
-        sem_post(&sem);     //唤醒主线程，表示tid_t准备好了
+        sem_post(&sem);     //唤醒主线程，表示tid_t准备好了(也就是子线程)
 
         func_();    //执行线程任务
     }));
-    sem_wait(&sem);
+    sem_wait(&sem);  //若子线程未准备好，主线程会一直阻塞在这里
 }
 
 void Thread::join()

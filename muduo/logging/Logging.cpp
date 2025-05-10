@@ -2,10 +2,7 @@
 
 #include "LogStream.h"
 #include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <ctime>
-#include <iterator>
 
 namespace ThreadInfo
 {
@@ -96,7 +93,8 @@ void Logger::Impl::finish()
             << ':'  << line_ << '\n';
 }
 
-Logger::Logger(const char* file, int line) : impl_(INFO, 0, file, line)
+Logger::Logger(const char* file, int line) 
+    : impl_(INFO, 0, file, line)
 {
 }
 

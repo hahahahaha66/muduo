@@ -195,6 +195,7 @@ void TcpConnection::connectEstablished()
     connectionCallback_(shared_from_this());  //通知上层应用更新自身状态
 }
 
+//调用该函数真正摧毁连接
 void TcpConnection::connectDestroyed()
 {
     if (state_ == kConnected)
@@ -262,8 +263,8 @@ void TcpConnection::handleWrite()
 
 void TcpConnection::handleClose()
 {
-    setState(kDisconnected);
-    channel_->disableAll();
+    setState(kDisconnected);  //设置连接状态
+    channel_->disableAll();  //关闭所有事件监听
 
     TcpConnectionPtr conPtr(shared_from_this());
     connectionCallback_(conPtr);

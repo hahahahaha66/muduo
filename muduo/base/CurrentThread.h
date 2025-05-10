@@ -7,7 +7,7 @@
 namespace CurrentThread
 {
     //保存tid缓冲，避免多次系统调用
-    extern __thread int t_cachedTid;
+    extern thread_local int t_cachedTid;
 
     void cacheTid();
 

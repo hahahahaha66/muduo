@@ -1,6 +1,8 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#include "noncopyable.h"
+
 #include <sched.h>
 #include <thread>
 #include <functional>
@@ -9,7 +11,6 @@
 #include <atomic>
 #include <unistd.h>
 #include <semaphore.h>
-#include "noncopyable.h"
 
 class Thread : noncopyable
 {

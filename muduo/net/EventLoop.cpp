@@ -15,6 +15,8 @@ const int kPollTimeMs = 10000;
 
 int createEventfd()
 {
+    //创建一个轻量级的文件描述符，通过向该文件描述符写，来唤醒IO线程
+    //主要用于跨线程唤醒
     int evfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     if (evfd < 0)
     {

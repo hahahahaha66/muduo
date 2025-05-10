@@ -90,6 +90,7 @@ inline Logger::LogLevel logLevel()  //获得日志等级
 
 const char* getErrnoMsg(int savedErrno);  //错误信息辅助函数
 
+//这里也就是为什么在写日志时直接使用LOG_,使用宏简化了Logger的构造细节
 //编译器宏，获取文件名，代码行号，函数名
 // \ 表示拼接宏，允许多行书写
 #define LOG_DEBUG if (logLevel() <= Logger::DEBUG) \

@@ -1,10 +1,9 @@
 #include "LogStream.h"
 
 #include <algorithm>
-#include <cstdint>
 #include <cstdio>
 
-//作者奇思：利用索引，简化了负数的判断
+//原作者奇思：利用索引，简化了负数的判断
 static const char digits[] = {'9', '8', '7','6', '5', 
                               '4', '3', '2', '1', '0', 
                              '1', '2', '3',  '4', '5', 
