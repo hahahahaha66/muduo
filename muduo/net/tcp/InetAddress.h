@@ -26,7 +26,6 @@ public:
     void setSockAddr(const sockaddr_in& addr) { addr_ = addr; }
 
 private:
-
     sockaddr_in addr_;  //网络地址结构体，包括地址族，端口，ip
 };
 

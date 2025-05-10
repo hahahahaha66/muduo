@@ -110,7 +110,7 @@ private:
     bool reading_;
 
     std::unique_ptr<Socket> socket_;  //已连接的socket文件描述符
-    std::unique_ptr<Channel> channel_;
+    std::unique_ptr<Channel> channel_;  //连接的channel
     
     const InetAddress localAddr_;  //本地地址
     const InetAddress peerAddr_;  //对端地址
